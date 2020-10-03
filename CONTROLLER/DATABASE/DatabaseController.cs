@@ -46,7 +46,9 @@ namespace My_Tetris.CONTROLLER.DATABASE
             using (DatabaseContext db = new DatabaseContext())
             {
                 return (from figure in db.CustomFigures
-                        where figure.Id == 1 || figure.Id == 2
+                            //where figure.Id == 1 || figure.Id == 0
+                            //where figure.Id <= 7
+                        //where figure.Id == 3
                         select hasher.DeHash(figure.hashed_figure)).ToList();
             }
         }

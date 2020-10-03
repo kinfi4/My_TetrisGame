@@ -28,7 +28,6 @@ namespace My_Tetris.CONTROLLER.Support_controllers
 
             return result.ToString();
         }
-
         public int[,] DeHash(string str_presentation_of_figure)
         {
 

@@ -27,7 +27,7 @@ namespace My_Tetris
             Console.CursorVisible = false;
 
             //FigureHasher f = new FigureHasher();
-            //var arr = f.DeHash("____/@@@@/____/____/");
+            //var arr = f.DeHash("@@@_/@@@@");
 
             //for (int i = 0; i < Math.Sqrt(arr.Length); i++)
             //{
@@ -60,7 +60,6 @@ namespace My_Tetris
 
                     case 3:
                         return;
-
 
                 }
             }

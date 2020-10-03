@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Text;
 using My_Tetris.CONTROLLER.DATABASE;
-using My_Tetris.CONTROLLER.Support_controllers;
 using My_Tetris.VIEW;
 
 namespace My_Tetris.CONTROLLER.Model_creator_controllers
@@ -20,7 +18,6 @@ namespace My_Tetris.CONTROLLER.Model_creator_controllers
         DatabaseController database = new DatabaseController();
         Frame_creator frame_Creator = new Frame_creator();
         Word_creator word_Creator = new Word_creator();
-        FigureHasher figureHasher = new FigureHasher(); 
 
         public void Draw_add_model_window()
         {
@@ -30,6 +27,8 @@ namespace My_Tetris.CONTROLLER.Model_creator_controllers
             Create_model();
 
         }
+
+
 
         private void Create_model()
         {
@@ -47,13 +46,22 @@ namespace My_Tetris.CONTROLLER.Model_creator_controllers
 
                     if (k.Key == ConsoleKey.Enter)
                     {
-                        if (!check_if_invalid(blocks))
+                        if (!check_if_invalid(blocks) || string.IsNullOrEmpty(blocks.ToString()))
                             continue;
 
-                        save_model_to_database(blocks);
-                        blocks.Clear();
 
+                        clear_model_line(blocks.ToString());
                         Clear_model_box();
+
+                        Console.SetCursorPosition((int)consta.x_for_add + 2 + 25, (int)consta.y_for_add + 1);
+                        Console.Write("Saving...");
+                        
+
+                        save_model_to_database(blocks);
+
+                        clear_model_line("Saving...");
+                        blocks = blocks.Clear();
+
                     }
 
                     if (k.Key == ConsoleKey.Q)
@@ -61,7 +69,7 @@ namespace My_Tetris.CONTROLLER.Model_creator_controllers
                         break;
                     }
 
-                    if(k.Key != ConsoleKey.Backspace)
+                    if(k.Key != ConsoleKey.Backspace && k.Key != ConsoleKey.Enter)
                         blocks.Append(k.KeyChar);
 
                     if (k.Key == ConsoleKey.Backspace)
@@ -70,12 +78,7 @@ namespace My_Tetris.CONTROLLER.Model_creator_controllers
                             continue;
 
                         blocks = blocks.Remove(blocks.Length - 1, 1);
-                        Console.SetCursorPosition((int)consta.x_for_add + 2 + 25, (int)consta.y_for_add + 1);
-
-                        for (int i = 0; i < blocks.Length + 1; i++)
-                        {
-                            Console.Write(' ');
-                        }
+                        clear_model_line(blocks.ToString());
 
                         Console.SetCursorPosition((int)consta.x_for_add + 2 + 25, (int)consta.y_for_add + 1);
                         Console.Write(blocks.ToString());
@@ -87,12 +90,6 @@ namespace My_Tetris.CONTROLLER.Model_creator_controllers
                         paint_the_figure(blocks);
                     }
 
-
-
-
-
-
-
                 }
 
             }
@@ -101,11 +98,24 @@ namespace My_Tetris.CONTROLLER.Model_creator_controllers
 
         }
 
-        private void save_model_to_database(StringBuilder blocks)
+        private static void clear_model_line(string blocks)
         {
-            database.save_figure_to_database(blocks.ToString());
+            Console.SetCursorPosition((int)consta.x_for_add + 2 + 25, (int)consta.y_for_add + 1);
+
+            for (int i = 0; i < blocks.Length + 1; i++)
+            {
+                Console.Write(' ');
+            }
+
+            Console.SetCursorPosition((int)consta.x_for_add + 2 + 25, (int)consta.y_for_add + 1);
+
         }
 
+        private void save_model_to_database(StringBuilder blocks)
+        {
+
+            database.save_figure_to_database(blocks.ToString());
+        }
         private void paint_the_figure(StringBuilder blocks)
         {
             int pos_x = (int)consta.x_for_add + (int)consta.x_size_add + 19, pos_y = 5;
@@ -126,7 +136,6 @@ namespace My_Tetris.CONTROLLER.Model_creator_controllers
 
             }
         }
-
         private bool check_if_invalid(StringBuilder blocks)
         {
             Console.CursorVisible = false;
