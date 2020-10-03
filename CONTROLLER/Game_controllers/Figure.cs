@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Text;
 
-namespace My_Tetris.controllers
+namespace My_Tetris.CONTROLLER.Game_controllers
 {
     class Figure : ICloneable
     {

@@ -1,46 +1,50 @@
 ﻿using My_Tetris.constants;
-using My_Tetris.controllers;
+using My_Tetris.CONTROLLER.Game_controllers;
+
 using System;
 using System.Diagnostics;
 using System.Drawing;
-using System.Threading;
 
-namespace My_Tetris.tetris_enviroment
+
+namespace My_Tetris.VIEW.tetris_enviroment
 {
-    public static class Tetris_env
+    public class Tetris_env
     {
-        static bool done, new_figure_needed;
-        static Tetris controller;
-        static string block = "@"; //"■";
-        static int speed;
-        static Stopwatch timer;
+        bool done, new_figure_needed;
+        Tetris controller;
+        string block = "@"; 
+        int speed;
+        Stopwatch timer;
+
+        Frame_creator frame_Creator = new Frame_creator();
+        Word_creator word_Creator = new Word_creator();
 
 
-        static Tetris_env()
+        public Tetris_env()
         {
             done = false;
             new_figure_needed = true;
-            speed = 250;
+            speed = 500;
             timer = new Stopwatch();
             controller = new Tetris();
         }
 
-        public static void Game()
+        public void Game()
         {
 
             // printing the world map
-            Paint_rect_frame(new Point((int)Constants.frame_coord_x, (int)Constants.frame_coord_y), 
-                                (int)Math.Sqrt(controller.world.Length),
-                                (int)Math.Sqrt(controller.world.Length));
+            frame_Creator.Draw_the_frame((int)Constants.frame_coord_x,
+                                         (int)Constants.frame_coord_y,
+                                         (int)Math.Sqrt(controller.world.Length),
+                                         (int)Math.Sqrt(controller.world.Length),
+                                         "#",
+                                          ConsoleColor.Red);
+      
 
             // the frame for "the next figure"
-            Paint_rect_frame(
-                new Point(
-                    (int)Constants.frame_coord_x + (int)Constants.world_x_size + 10,
-                    (int)Constants.frame_coord_y),
-                                                8,
-                                                8);
-
+            frame_Creator.Draw_the_frame((int)Constants.frame_coord_x + (int)Constants.world_x_size + 10,
+                                         (int)Constants.frame_coord_y,
+                                                8, 8, "#", ConsoleColor.Red);
 
             int drop = 0;
             int score = 0;
@@ -49,7 +53,12 @@ namespace My_Tetris.tetris_enviroment
             var current_figure = controller.create_figure();
             var next_figure = controller.create_figure();
 
-            Print_the_score(score);
+            // Printing the score
+            word_Creator.print_word((int)Constants.frame_coord_x + (int)Constants.world_x_size + 10,
+                                    (int)Constants.frame_coord_y + 9,
+                                    $"Score: {score}");
+
+
             paint_the_next_figure(next_figure, block);
 
             timer.Start();
@@ -71,7 +80,7 @@ namespace My_Tetris.tetris_enviroment
                 if ((int)timer.ElapsedMilliseconds > speed - drop)
                 {
                     timer.Restart();
-                    new_figure_needed = !controller.step(current_figure);
+                    new_figure_needed = !controller.Make_Move(current_figure);
                 }
 
 
@@ -91,20 +100,27 @@ namespace My_Tetris.tetris_enviroment
                     update_droped_blocks();
 
                     score += cleared_on_this_step * 8 + (cleared_on_this_step - 1) * 8;
-                    Print_the_score(score);
+
+                    word_Creator.print_word((int)Constants.frame_coord_x + (int)Constants.world_x_size + 10,
+                                            (int)Constants.frame_coord_y + 9,
+                                            $"Score: {score}");
                 }
 
+
+                if (controller.the_game_has_ended(score))
+                    break;
             }
+
+            Console.Clear();
+            Console.WriteLine("End");
         }
 
-
-
-        private static void paint_the_next_figure(Figure next_figure, string figure_block)
+        private void paint_the_next_figure(Figure next_figure, string figure_block)
         {
             for (int y = 0; y < Math.Sqrt(next_figure.Array_presentation.Length); y++)
             {
                 Console.SetCursorPosition((int)Constants.frame_coord_x + (int)Constants.world_x_size + 10 + 2,
-                                      (int)Constants.frame_coord_y + 2 + y);
+                                          (int)Constants.frame_coord_y + 2 + y);
 
                 for (int x = 0; x < Math.Sqrt(next_figure.Array_presentation.Length); x++)
                 {
@@ -112,7 +128,7 @@ namespace My_Tetris.tetris_enviroment
                         Console.Write(figure_block);
                     else
                         Console.Write(' ');
-                       
+                    
                 }
             }
 
@@ -122,17 +138,7 @@ namespace My_Tetris.tetris_enviroment
 
         }
 
-        private static void Print_the_score(int score)
-        {
-            Console.SetCursorPosition(
-                (int)Constants.frame_coord_x + (int)Constants.world_x_size + 10,
-                (int)Constants.frame_coord_y + 9);
-
-
-            Console.Write($"Score: {score}");
-        }
-
-        private static void update_droped_blocks()
+        private void update_droped_blocks()
         {
             for (int y = 1; y < Math.Sqrt(controller.world.Length) - 1; y++)
             {
@@ -148,7 +154,7 @@ namespace My_Tetris.tetris_enviroment
             }
         }
 
-        private static int Translate_user_input_into_action(Figure current_figure)
+        private int Translate_user_input_into_action(Figure current_figure)
         {
             int drop = 0;
             var player_choice = Check_the_direction();
@@ -160,7 +166,7 @@ namespace My_Tetris.tetris_enviroment
             }
             else if (player_choice[0] == 0)
             {
-                controller.step(current_figure,
+                controller.Make_Move(current_figure,
                     player_choice[1], player_choice[2]);
 
             }
@@ -176,7 +182,7 @@ namespace My_Tetris.tetris_enviroment
             return drop;
         }
 
-        private static int[] Check_the_direction()
+        private int[] Check_the_direction()
         {
 
             if (Console.KeyAvailable)
@@ -213,13 +219,13 @@ namespace My_Tetris.tetris_enviroment
             return new int[] { 2, 0, -1 };
         }
 
-        private static Point translate_coordinates(Point relative)
+        private Point translate_coordinates(Point relative)
         {
             return new Point(relative.X + (int)Constants.frame_coord_x,
                             relative.Y + (int)Constants.frame_coord_y);
         }
-        
-        private static void Paint_updated_world()
+
+        private void Paint_updated_world()
         {
             for (int y = 0; y < Math.Sqrt(controller.world.Length); y++)
             {
@@ -244,33 +250,7 @@ namespace My_Tetris.tetris_enviroment
             }
         }
 
-        private static void Paint_rect_frame(Point point, int y_s, int x_s)
-        {
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.SetCursorPosition(point.X, point.Y);
-            for (int x = 0; x < x_s; x++)
-            {
-                Console.Write('#');
-            }
-
-            for (int y = 1; y < y_s - 1; y++)
-            {
-                Console.SetCursorPosition(point.X, point.Y + y);
-                Console.Write('#');
-
-                Console.SetCursorPosition(point.X + x_s - 1, point.Y + y);
-                Console.Write('#');
-            }
-
-            Console.SetCursorPosition(point.X, point.Y + y_s - 1);     
-            for (int x = 0; x < x_s; x++)
-            {
-                Console.Write('#');
-            }
-
-            Console.ForegroundColor = ConsoleColor.Gray;
-
-        }
+      
 
 
 

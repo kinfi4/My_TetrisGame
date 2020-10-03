@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace My_Tetris.DATABASE.MODELS
+namespace My_Tetris.MODEL
 {
     class GameScore
     {

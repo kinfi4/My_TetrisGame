@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
-namespace My_Tetris.controllers
+namespace My_Tetris.CONTROLLER.Support_controllers
 {
     class FigureHasher
     {
@@ -29,12 +31,29 @@ namespace My_Tetris.controllers
 
         public int[,] DeHash(string str_presentation_of_figure)
         {
-            var lines = str_presentation_of_figure.Split('/');
-            int[,] result = new int[lines.Length - 1, lines.Length - 1];
 
-            for (int line_index = 0; line_index < lines.Length - 1; line_index++)
+            if (str_presentation_of_figure[str_presentation_of_figure.Length - 1] == '/')
+                str_presentation_of_figure = str_presentation_of_figure
+                    .Substring(0, str_presentation_of_figure.Length - 1);
+
+
+            var lines = str_presentation_of_figure.Split('/').ToList();
+
+            while (lines.Count < lines[0].Length)
             {
-                for (int x = 0; x < lines.Length - 1; x++)
+                var __add_s = "";
+                for (int i = 0; i < lines[0].Length; i++)
+                    __add_s += "_";
+
+                lines.Add(__add_s);                    
+            }
+
+
+            int[,] result = new int[lines.Count, lines.Count];
+
+            for (int line_index = 0; line_index < lines.Count; line_index++)
+            {
+                for (int x = 0; x < lines.Count; x++)
                 {
                     result[line_index, x] = lines[line_index][x] == '@' ? 1 : 0;
                 }

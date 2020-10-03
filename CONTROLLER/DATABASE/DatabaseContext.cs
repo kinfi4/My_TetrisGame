@@ -1,8 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 
-using My_Tetris.DATABASE.MODELS;
+using My_Tetris.MODEL;
 
-namespace My_Tetris.DATABASE
+namespace My_Tetris.CONTROLLER.DATABASE
 {
     class DatabaseContext : DbContext
     {
