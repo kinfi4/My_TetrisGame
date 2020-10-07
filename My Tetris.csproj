@@ -14,8 +14,4 @@
     </PackageReference>
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="VIEW\Records_window\" />
-  </ItemGroup>
-
 </Project>

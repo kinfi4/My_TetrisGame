@@ -26,20 +26,6 @@ namespace My_Tetris
         {
             Console.CursorVisible = false;
 
-            //FigureHasher f = new FigureHasher();
-            //var arr = f.DeHash("@@@_/@@@@");
-
-            //for (int i = 0; i < Math.Sqrt(arr.Length); i++)
-            //{
-            //    for (int k = 0; k < Math.Sqrt(arr.Length); k++)
-            //    {
-            //        Console.Write(arr[i, k]);
-            //    }
-            //    Console.WriteLine();
-            //}
-
-
-
             while (true)
             {
                 Console.Clear();
@@ -63,7 +49,6 @@ namespace My_Tetris
 
                 }
             }
-
 
 
         }
